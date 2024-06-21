@@ -18,6 +18,7 @@ class GoogleSheetService {
     this.jwtFromEnv = new JWT({
       email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
       key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+      //key: process.env.GOOGLE_PRIVATE_KEY,
       scopes: SCOPES,
     });
     this.doc = new GoogleSpreadsheet(id, this.jwtFromEnv);
@@ -53,13 +54,31 @@ class GoogleSheetService {
    */
   saveOrder = async (data = {}) => {
     await this.doc.loadInfo();
-    const sheet = this.doc.sheetsByIndex[1]; // the first sheet
+    const sheet = this.doc.sheetsByIndex[0]; // the first sheet
 
     const order = await sheet.addRow({
       fecha: data.fecha,
       telefono: data.telefono,
+      suscriptor:data.suscriptor,
+      numeroServicio: data.numeroServicio,
+      contacto: data.contacto,
       nombre: data.nombre,
-      pedido: data.pedido,
+      direccion: data.direccion,
+      observaciones: data.observaciones,
+    });
+
+    return order
+  };
+  saveOrderAgente = async (data = {}) => {
+    await this.doc.loadInfo();
+    //const sheet = this.doc.sheetsByIndex[2]; // the second sheet
+    const sheetA = this.doc.sheetsByIndex[1]
+
+    const order = await sheetA.addRow({
+      fecha: data.fecha,
+      telefono: data.telefono,
+      nombre: data.nombre,
+      contacto: data.contacto,
       observaciones: data.observaciones,
     });
 

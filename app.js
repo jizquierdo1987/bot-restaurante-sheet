@@ -8,109 +8,31 @@ import MockAdapter from "@bot-whatsapp/database/mock";
 import chatgpt from "./services/openai/chatgpt.js";
 import GoogleSheetService from "./services/sheets/index.js";
 
+import agenteFlow from "./flows/agente.flow.js";
+import despedidaFlow from "./flows/despedida.flow.js";
+import registerFlow from "./flows/register.flow.js";
+import registerAgenteFlow from "./flows/registerAgente.flow.js";
+import reparacionFlow from "./flows/reparacion.flow.js";
+import welcomeFlow from "./flows/welcome.flow.js";
+
 const googelSheet = new GoogleSheetService(
-  "1rDDWdRcLmecRhDSepMZdJwxMIp8iOxZMjDKuh2dA6W8"
+  "15Ihwlc-6N-hMRctQV8vxR9P43UcVsJ9TTcGmdK8y6BM"
 );
+
 
 const GLOBAL_STATE = [];
 
-const flowPrincipal = bot
-  .addKeyword(["hola", "hi"])
-  .addAnswer([
-    `Bienvenidos a mi restaurante de cocina economica automatizado! 🚀`,
-    `Tenemos menus diarios variados`,
-    `Te gustaria conocerlos ¿?`,
-    `Escribe *menu*`,
-  ]);
-
-const flowMenu = bot
-  .addKeyword("menu")
-  .addAnswer(
-    `Hoy tenemos el siguiente menu:`,
-    null,
-    async (_, { flowDynamic }) => {
-      const dayNumber = getDay(new Date());
-      const getMenu = await googelSheet.retriveDayMenu(dayNumber);
-      for (const menu of getMenu) {
-        GLOBAL_STATE.push(menu);
-        await flowDynamic(menu);
-      }
-    }
-  )
-  .addAnswer(
-    `Te interesa alguno?`,
-    { capture: true },
-    async (ctx, { gotoFlow, state }) => {
-      const txt = ctx.body;
-      const check = await chatgpt.completion(`
-    Hoy el menu de comida es el siguiente:
-    "
-    ${GLOBAL_STATE.join("\n")}
-    "
-    El cliente quiere "${txt}"
-    Basado en el menu y lo que quiere el cliente determinar (EXISTE, NO_EXISTE).
-    La orden del cliente
-    `);
-
-      const getCheck = check.data.choices[0].text
-        .trim()
-        .replace("\n", "")
-        .replace(".", "")
-        .replace(" ", "");
-
-      if (getCheck.includes("NO_EXISTE")) {
-        return gotoFlow(flowEmpty);
-      } else {
-        state.update({pedido:ctx.body})
-        return gotoFlow(flowPedido);
-      }
-    }
-  );
-
-const flowEmpty = bot
-  .addKeyword(bot.EVENTS.ACTION)
-  .addAnswer("No te he entendido!", null, async (_, { gotoFlow }) => {
-    return gotoFlow(flowMenu);
-  });
-
-const flowPedido = bot
-  .addKeyword(["pedir"], { sensitive: true })
-  .addAnswer(
-    "¿Cual es tu nombre?",
-    { capture: true },
-    async (ctx, { state }) => {
-      state.update({ name: ctx.body });
-    }
-  )
-  .addAnswer(
-    "¿Alguna observacion?",
-    { capture: true },
-    async (ctx, { state }) => {
-      state.update({ observaciones: ctx.body });
-    }
-  )
-  .addAnswer(
-    "Perfecto tu pedido estara listo en un aprox 20min",
-    null,
-    async (ctx, { state }) => {
-        const currentState = state.getMyState();
-      await googelSheet.saveOrder({
-        fecha: new Date().toDateString(),
-        telefono: ctx.from,
-        pedido: currentState.pedido,
-        nombre: currentState.name,
-        observaciones: currentState.observaciones,
-      });
-    }
-  );
+/*** add Answer
+ * const A = Obloigatorio: Un texto "hola", array ["hola", "como estás"]
+ * const B = Opcional null: es un objeto {media, delay, capture, buttons}
+ * const C = Opcional null: es una array de flujos
+ * const D = Opcional = es una array de flujos hojos!
+ */
 
 const main = async () => {
   const adapterDB = new MockAdapter();
   const adapterFlow = bot.createFlow([
-    flowPrincipal,
-    flowMenu,
-    flowPedido,
-    flowEmpty,
+   agenteFlow, despedidaFlow, registerFlow, registerAgenteFlow, reparacionFlow, welcomeFlow
   ]);
   const adapterProvider = bot.createProvider(BaileysProvider);
 
