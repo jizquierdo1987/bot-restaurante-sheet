@@ -1,13 +1,17 @@
-const {addKeyword} = require('@bot-whatsapp/bot');
+//const {addKeyword} = require('@bot-whatsapp/bot');
 //import { addKeyword } from '@bot-whatsapp/bot';
-
+import bot from "@bot-whatsapp/bot";
+import GoogleSheetService from "../services/sheets/index.js";
+const googelSheet = new GoogleSheetService(
+  "15Ihwlc-6N-hMRctQV8vxR9P43UcVsJ9TTcGmdK8y6BM"
+);
 function validarNumeroEcuador(num) {
   const regex = /^09\d{8}$/;
   return regex.test(num);
 };
 
 /***Flujo de registro para agente */
-module.exports = addKeyword('REGISTER_FLOW_AGENTE')
+const registerAgenteFlow = bot.addKeyword('REGISTER_FLOW_AGENTE')
           .addAnswer(`Favor dime tu nombre y apellido`, { capture: true }, async (ctx, { state }) => {
             await state.update({ name: ctx.body })
           })    
@@ -41,3 +45,4 @@ module.exports = addKeyword('REGISTER_FLOW_AGENTE')
                   });
                 }
               );
+export default registerAgenteFlow;

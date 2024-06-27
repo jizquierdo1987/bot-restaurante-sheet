@@ -1,9 +1,11 @@
-const {addKeyword} = require('@bot-whatsapp/bot');
+//const {addKeyword} = require('@bot-whatsapp/bot');
 //import {addKeyword} from '@bot-whatsapp/bot';
+import bot from "@bot-whatsapp/bot";
+import registerAgenteFlow from "./registerAgente.js";
 
 /***Flujo de Agente */
 
-module.exports = addKeyword('agente','Agente','AGENTE')
+const agenteFlow = bot.addKeyword('agente','Agente','AGENTE')
     .addAnswer(
       ['Necesito algunos datos de contacto para que un agente te llame', '¿Estás de acuerdo? *1*: si ó *2*: no'].join(
           '\n'
@@ -14,9 +16,11 @@ module.exports = addKeyword('agente','Agente','AGENTE')
             return fallBack('Esa opción no es válida')
         }
         if (ctx.body==='1') {
-          return gotoFlow(registerFlowAgente)
+          return gotoFlow(registerAgenteFlow)
       }else {
         endFlow('gracias!, estoy para servirte en tus consultas')
       }
     }
   );
+
+export default agenteFlow;

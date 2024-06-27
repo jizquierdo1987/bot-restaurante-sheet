@@ -1,9 +1,11 @@
-const {addKeyword} = require('@bot-whatsapp/bot');
+//const {addKeyword} = require('@bot-whatsapp/bot');
 //import { addKeyword } from '@bot-whatsapp/bot';
+import bot from "@bot-whatsapp/bot";
+import registerFlow from "./register.js";
 
 /***Flujo Reparación */
 
-module.exports = addKeyword('reparación','rep','Reparación','REP')
+const reparacionFlow = bot.addKeyword('reparación','rep','Reparación','REP')
     .addAnswer(
       ['De acuerdo vamos a realizar un agendamiento de tu problema', '¿Estás de acuerdo? *1*: si ó *2*: no'].join(
           '\n'
@@ -20,3 +22,4 @@ module.exports = addKeyword('reparación','rep','Reparación','REP')
         }
       }
   );
+export default reparacionFlow;

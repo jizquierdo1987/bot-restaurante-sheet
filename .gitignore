@@ -1,5 +1,7 @@
 node_modules/
 key.json
+google-key.json
+*_sessions/
 bot_*
 .env
 *.log
